@@ -1,6 +1,6 @@
 import "../styles/main.scss"
-import Score4LMS from "../scripts/single-choice-set";
+import S4L from "../scripts/single-choice-set";
 
 // Load library
 H5P = H5P || {};
-H5P.Score4LMS = Score4LMS;
+H5P.Score4LMS = S4L;

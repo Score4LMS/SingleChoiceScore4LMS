@@ -11,7 +11,7 @@ import {
 }
 from "./globals";
 
-const Score4LMS = (function () {
+const S4L = (function () {
     /**
      * @constructor
      * @extends Question
@@ -123,11 +123,10 @@ const Score4LMS = (function () {
         console.log("choicesVOR****************");
           // .getElementById("mpw84lc")..querySelector("#rootSVG")
         console.log(this.options);
-             
         for (var i = 0; i < this.options.descriptions.length; i++) {
         
-         console.log("in this.options.descriptions");
-         console.log(i);
+         //console.log("in this.options.descriptions");
+         //console.log(i);
          
             var choice = new SingleChoice(this.options.descriptions[i], i, this.contentId, self.options.behaviour.autoCheck, 'descContent');
             //choice.on('finished', this.handleQuestionFinished, this);
@@ -138,16 +137,15 @@ const Score4LMS = (function () {
             this.$slides.push(choice.$choice);
             
             var indexDesc = this.options.descriptions[i];
+            console.log("this.$choices", this.$choices)
             var vse = new VerovioScoreEditor(this.$choices, {data: indexDesc.Notation});
             console.log(vse);
             
-            
-          
         }
         
         
        //console.log(H5PEditor.widgets.notationWidget);
-       console.log(document);
+       //console.log(document);
           
         for (var i = 0; i < this.options.choices.length; i++) {
         console.log("in this.options.choices");
@@ -853,4 +851,4 @@ const Score4LMS = (function () {
     return Score4LMS;
 })();
 
-export default Score4LMS;
+export default S4L;
