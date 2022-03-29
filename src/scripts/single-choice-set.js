@@ -40,15 +40,19 @@ const S4L = (function () {
             }
         },
         options);
+        
         if (contentData && contentData.previousState !== undefined) {
             this.currentIndex = contentData.previousState.progress;
+            
             this.results = contentData.previousState.answers;
         }
+       
         this.currentIndex = this.currentIndex || 0;
         this.results = this.results || {
             corrects: 0,
             wrongs: 0
         };
+        
         
         /**
          * @property {StopWatch[]} Stop watches for tracking duration of slides
@@ -81,8 +85,7 @@ const S4L = (function () {
         this.$container = $('<div>', {
             'class': 'h5p-sc-set-wrapper'
         });
-        console.log("test****************");
-        console.log(options);
+       
         if (options.behaviour.autoCheck) {
             this.$container.addClass('h5p-auto-check');
         }
@@ -90,6 +93,7 @@ const S4L = (function () {
         this.$slides =[];
         // An array containing the SingleChoice instances
         this.choices =[];
+        this.desc =[];
         
         /**
          * The solution dialog
@@ -102,8 +106,18 @@ const S4L = (function () {
             self.focusButton();
         });
         
+        const testId = `single-choice-WP5-${this.id}-test-${this.index}`;
+        const testId2 = `single-choice-WP5-${this.id}-test2-${this.index}`;
         this.$choices = $('<div>', {
+            'id': testId,
             'class': 'h5p-sc-set h5p-sc-animate'
+            
+        });
+        
+       this.$desc = $('<div>', {
+            'id':  testId2,
+            'class': 'h5p-sc-set h5p-sc-animate'
+            
         });
         
         // sometimes an empty object is in the choices
@@ -119,43 +133,40 @@ const S4L = (function () {
         });
         self.progressbar.setProgress(this.currentIndex);
         
-        
-        console.log("choicesVOR****************");
-          // .getElementById("mpw84lc")..querySelector("#rootSVG")
-        console.log(this.options);
         for (var i = 0; i < this.options.descriptions.length; i++) {
-        
-         //console.log("in this.options.descriptions");
-         //console.log(i);
-         
-            var choice = new SingleChoice(this.options.descriptions[i], i, this.contentId, self.options.behaviour.autoCheck, 'descContent');
-            //choice.on('finished', this.handleQuestionFinished, this);
-            //choice.on('alternative-selected', this.handleAlternativeSelected, this);
-            
-            choice.appendTo(this.$choices, (i === this.currentIndex));
-            this.choices.push(choice);
-            this.$slides.push(choice.$choice);
-            
-            var indexDesc = this.options.descriptions[i];
-            console.log("this.$choices", this.$choices)
-            var vse = new VerovioScoreEditor(this.$choices, {data: indexDesc.Notation});
-            console.log(vse);
-            
+       
+           
+           var indexDesc = this.options.descriptions[i];
+           
+           
+          
+           this.$desc.append($('<div>', {
+      'id': testId + i,
+      'class': 'h5p-sc-question',
+      'html':  indexDesc.desc1
+    }));
+    
+    //var vse = new VerovioScoreEditor(this.$choices[0], {data: indexDesc.Notation}); 
+           this.$desc.append($('<div>', {
+      'id': testId + i+'score',
+      'class': 'h5p-sc-question',
+      'html':  new VerovioScoreEditor(this.$choices[0], {data: indexDesc.Notation})
+    }));
+       
         }
         
-        
-       //console.log(H5PEditor.widgets.notationWidget);
-       //console.log(document);
           
         for (var i = 0; i < this.options.choices.length; i++) {
-        console.log("in this.options.choices");
-        console.log(i);
-            var choice = new SingleChoice(this.options.choices[i], i, this.contentId, self.options.behaviour.autoCheck);
+        
+            
+            var choice = new SingleChoice(this.options.choices[i], i, this.contentId, self.options.behaviour.autoCheck, this.$desc); //
             choice.on('finished', this.handleQuestionFinished, this);
             choice.on('alternative-selected', this.handleAlternativeSelected, this);
-            choice.appendTo(this.$choices, (i === this.currentIndex));
+            choice.appendTo(this.$choices, i === this.currentIndex); 
             this.choices.push(choice);
             this.$slides.push(choice.$choice);
+            
+            
            
         }
         
@@ -166,13 +177,7 @@ const S4L = (function () {
         this.resultSlide.on('view-solution', this.handleViewSolution, this);
         this.$slides.push(this.resultSlide.$resultSlide);
         this.on('resize', this.resize, this);
-        
-         console.log("$choices****************");
-        console.log(this.$choices);
-        
        
-            
-        
         // Use the correct starting slide
         this.recklessJump(this.currentIndex);
         
@@ -230,6 +235,7 @@ const S4L = (function () {
      * @returns {jQuery} The element
      */
     Score4LMS.prototype.setTabbable = function ($element, tabbable) {
+    
         $element.attr('tabindex', tabbable ? 0: -1);
         return $element;
     };

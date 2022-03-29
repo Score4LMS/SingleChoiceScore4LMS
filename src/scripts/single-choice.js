@@ -1,13 +1,8 @@
 import { jQuery as $, EventDispatcher, shuffleArray } from "./globals";
 import Controls from 'h5p-lib-controls/src/scripts/controls';
 import UIKeyboard from 'h5p-lib-controls/src/scripts/ui/keyboard';
-//import VerovioScoreEditor from 'verovioscoreeditor';
 
 export default class SingleChoice extends EventDispatcher {
-
-
- //const VSE = require('verovioscoreeditor');
-
   /**
    * Constructor function.
    * @constructor
@@ -18,7 +13,7 @@ export default class SingleChoice extends EventDispatcher {
    */
   constructor (options, index, id, autoCheck, descConst) {
     super();
-    
+
     // Extend defaults with provided options
     this.options = $.extend(true, {}, {
       question: '',
@@ -37,7 +32,7 @@ export default class SingleChoice extends EventDispatcher {
     // add keyboard controls
     this.controls = new Controls([new UIKeyboard()]);
     this.controls.on('select', this.handleAlternativeSelected, this);
-   
+
     // create config
     this.options.answers = shuffleArray(this.options.answers.map((answer, index) => ({
       text: this.options.answers[index],
@@ -45,8 +40,7 @@ export default class SingleChoice extends EventDispatcher {
       answerIndex: index
     })));
   }
-  
-   
+
   /**
    * appendTo function invoked to append SingleChoice to container
    *
@@ -54,79 +48,21 @@ export default class SingleChoice extends EventDispatcher {
    * @param {boolean} isCurrent Current slide we are on
    */
   appendTo ($container, isCurrent) {
+
     const questionId = `single-choice-${this.id}-question-${this.index}`;
-    const testId = `single-choice-${this.id}-test-${this.index}`;
     this.$container = $container;
 
     this.$choice = $('<div>', {
       'class': 'h5p-sc-slide h5p-sc' + (isCurrent ? ' h5p-sc-current-slide' : ''),
       css: {'left': (this.index * 100) + '%'}
     });
-  
-  
-  console.log("this.options in single choice+++++++++++++++++++++++++++");
-    console.log(this.options.desc1);
-    console.log(this.options.question);
-  //if(this.options.desc1 !== undefined){
-    this.$choice.append($('<div>', {
-      'id': testId,
-      'class': 'h5p-sc-question',
-      'html': this.options.desc1 +'<br>'// +  this.options.Notation
-    }));
-    
-    
-     // var vse = new VerovioScoreEditor(this.$choice, null, this.options.Notation);
-           // this.vse = new VerovioScoreEditor(this.container.firstChild, null, this.setMei)
-          //  console.log(vse);
-   
-    //$choice[0].classList.add("vse-container");
-   
-       // var vse = new VSE.VerovioScoreEditor($choice, this.options.Notation); // just initialize transpiled ts
-       /* vse.init().then(() => {
-            var smHandler = this.vse.getCore().getInsertHandler().getSMHandler()
-            that.on("enterFullScreen", smHandler.removeFunction)
-            that.on("enterFullScreen", smHandler.drawFunction)
-            that.on("exitFullScreen", smHandler.removeFunction)
-            that.on("exitFullScreen", smHandler.drawFunction)
-        })
-    */
-    console.log(this.options.Notation);
-    
-   // else{
-  /* this.$choice.append($('<div>', {
-      'id': questionId,
-      'class': 'h5p-sc-question',
-      'html': '<br>'+this.options.desc1//+ this.options.Notation +'<br>' 
-    }));*/
-    //console.log("wenn nicht undefined+++++++++++++++++++++++++++");
-   // console.log(this.options.Notation);
-    //this.options.Notation.getElementById(questionId).querySelector("#rootSVG");
-//}
-  
-// if(this.options.question !== ''){
-  this.$choice.append($('<div>', {
-      'id': questionId,
-      'class': 'h5p-sc-question',
-      'html': this.options.question
-      
-    })); 
-   
- 
-// }
- //else{
-      /*  this.$choice.append($('<div>', {
-      'id': questionId,
-      'class': 'h5p-sc-question',
-      'html': '<br>'+this.options.question
-      
-    })); */
- //  console.log("wenn nicht empty+++++++++++++++++++++++++++");
-    
- //}
 
-    /*console.log("appendTo+++++++++++++++++++++++++++");
-    console.log(this.options.question);
-    console.log(this.options);*/
+
+    this.$choice.append($('<div>', {
+      'id': questionId,
+      'class': 'h5p-sc-question',
+      'html': this.descConst[0].innerHTML + this.options.question //
+    }));
 
     var $alternatives = $('<ul>', {
       'class': 'h5p-sc-alternatives',
@@ -146,23 +82,17 @@ export default class SingleChoice extends EventDispatcher {
         }
       }
     }).toggle(!this.autoCheck);
-    
-/*console.log('**************Answers');    
-console.log(this.options.answers);*/
-if(this.options.answers !== false){
 
-     this.alternativeElements = this.options.answers.map(opts => this.createAlternativeElement(opts));
+    this.alternativeElements = this.options.answers.map(opts => this.createAlternativeElement(opts));
 
-    
+    $alternatives.append(this.alternativeElements);
 
-    
-}
-$alternatives.append(this.alternativeElements);
-   this.$choice.append($alternatives);
+    this.$choice.append($alternatives);
     this.$choice.append(this.$nextButton);
     $container.append(this.$choice);
     return this.$choice;
   };
+ 
 
   /**
    * Focus on an alternative by index
