@@ -55,7 +55,7 @@ export default class SingleChoice extends EventDispatcher {
    */
   appendTo ($container, isCurrent) {
     const questionId = `single-choice-${this.id}-question-${this.index}`;
-    const testId = `single-choice-${this.id}-test-${this.index}`;
+    //const testId = `single-choice-${this.id}-test-${this.index}`;
     this.$container = $container;
 
     this.$choice = $('<div>', {
@@ -64,13 +64,11 @@ export default class SingleChoice extends EventDispatcher {
     });
   
   
-  console.log("this.options in single choice+++++++++++++++++++++++++++");
-    console.log(this.options.desc1);
-    console.log(this.options.question);
+  //console.log("this.options in single choice+++++++++++++++++++++++++++");
+    // console.log(this.options.desc1);
+    // console.log(this.options.question);
   //if(this.options.desc1 !== undefined){
     this.$choice.append($('<div>', {
-      'id': testId,
-      'class': 'h5p-sc-question',
       'html': this.options.desc1 +'<br>'// +  this.options.Notation
     }));
     

@@ -20,6 +20,10 @@ const S4L = (function () {
      * @param {Object} contentData H5P instance data
      */
     function Score4LMS(options, contentId, contentData) {
+
+        //frames can only be adjusted, when content has loaded successfully
+        $(this.adjustFrame.bind(this))
+
         var self = this;
         
         // Extend defaults with provided options
@@ -32,7 +36,7 @@ const S4L = (function () {
             behaviour: {
                 timeoutCorrect: 2000,
                 timeoutWrong: 3000,
-                soundEffectsEnabled: true,
+                soundEffectsEnabled: false,
                 enableRetry: true,
                 enableSolutionsButton: true,
                 autoCheck: true,
@@ -77,12 +81,11 @@ const S4L = (function () {
         },
         options.l10n !== undefined ? options.l10n: {
         });
+
         
         this.$container = $('<div>', {
             'class': 'h5p-sc-set-wrapper'
         });
-        console.log("test****************");
-        console.log(options);
         if (options.behaviour.autoCheck) {
             this.$container.addClass('h5p-auto-check');
         }
@@ -90,6 +93,9 @@ const S4L = (function () {
         this.$slides =[];
         // An array containing the SingleChoice instances
         this.choices =[];
+
+        //array of containers for later scaling
+        this.vseContainer = [];
         
         /**
          * The solution dialog
@@ -120,27 +126,27 @@ const S4L = (function () {
         self.progressbar.setProgress(this.currentIndex);
         
         
-        console.log("choicesVOR****************");
-          // .getElementById("mpw84lc")..querySelector("#rootSVG")
-        console.log(this.options);
         for (var i = 0; i < this.options.descriptions.length; i++) {
         
-         //console.log("in this.options.descriptions");
-         //console.log(i);
          
             var choice = new SingleChoice(this.options.descriptions[i], i, this.contentId, self.options.behaviour.autoCheck, 'descContent');
             //choice.on('finished', this.handleQuestionFinished, this);
             //choice.on('alternative-selected', this.handleAlternativeSelected, this);
             
-            choice.appendTo(this.$choices, (i === this.currentIndex));
-            this.choices.push(choice);
-            this.$slides.push(choice.$choice);
+            choice.appendTo(this.$container, (i === this.currentIndex));
+            // this.choices.push(choice);
+            // this.$slides.push(choice.$choice);
             
             var indexDesc = this.options.descriptions[i];
-            console.log("this.$choices", this.$choices)
-            var vse = new VerovioScoreEditor(this.$choices, {data: indexDesc.Notation});
-            console.log(vse);
-            
+            //var vse = new VerovioScoreEditor(this.$choices[0], {data: indexDesc.Notation});
+            if(indexDesc.Notation != undefined){
+                var $vseDesc = $('<div>',{
+                    'id': 'vseDesc' + i.toString()
+                })
+                var vse = new VerovioScoreEditor($vseDesc[0], {data: indexDesc.Notation});
+                $vseDesc.appendTo(this.$container, (i === this.currentIndex))
+                this.vseContainer.push($vseDesc[0])
+            }
         }
         
         
@@ -148,15 +154,23 @@ const S4L = (function () {
        //console.log(document);
           
         for (var i = 0; i < this.options.choices.length; i++) {
-        console.log("in this.options.choices");
-        console.log(i);
             var choice = new SingleChoice(this.options.choices[i], i, this.contentId, self.options.behaviour.autoCheck);
             choice.on('finished', this.handleQuestionFinished, this);
             choice.on('alternative-selected', this.handleAlternativeSelected, this);
             choice.appendTo(this.$choices, (i === this.currentIndex));
             this.choices.push(choice);
             this.$slides.push(choice.$choice);
-           
+            console.log("CHOICE", choice)
+            var indexDesc = this.options.choices[i];
+            //var vse = new VerovioScoreEditor(this.$choices[0], {data: indexDesc.Notation});
+            if(indexDesc.question_notation != undefined){
+                var $vseChoice = $('<div>',{
+                    'id': 'vseChoice' + i.toString()
+                })
+                var vse = new VerovioScoreEditor($vseChoice[0], {data: indexDesc.question_notation});
+                this.vseContainer.push($vseChoice[0])
+                $vseChoice.appendTo(choice.$choice)
+            }
         }
         
         this.resultSlide = new ResultSlide(this.options.choices.length);
@@ -166,13 +180,7 @@ const S4L = (function () {
         this.resultSlide.on('view-solution', this.handleViewSolution, this);
         this.$slides.push(this.resultSlide.$resultSlide);
         this.on('resize', this.resize, this);
-        
-         console.log("$choices****************");
-        console.log(this.$choices);
-        
-       
-            
-        
+
         // Use the correct starting slide
         this.recklessJump(this.currentIndex);
         
@@ -217,10 +225,26 @@ const S4L = (function () {
     }
     
     Score4LMS.prototype = Object.create(Question.prototype);
-    console.log("*****************************************");
-     console.log(Score4LMS.prototype);
    
     Score4LMS.prototype. constructor = Score4LMS;
+
+    /**
+     * Adjust an its contents when all content is loaded
+     */
+    Score4LMS.prototype.adjustFrame = function(){
+       
+        this.vseContainer.forEach(vc => vc.style.height = "500px")
+        var h5pContainer = document.querySelector(".h5p-container")
+        var showChildren = h5pContainer.querySelectorAll(".h5p-sc-set > *, .h5p-actions, .vse-container, .h5p-sc")
+        var h5pContainerHeight = 0
+        showChildren.forEach(sc => {
+            h5pContainerHeight += sc.getBoundingClientRect().height
+            console.log("HEIGHT", h5pContainerHeight)
+            sc.style.position = "relative"
+        })
+        h5pContainer.style.height =  h5pContainerHeight.toString() + "px"
+        window.frameElement.style.height =  h5pContainerHeight.toString() + "px"
+    }
     
     /**
      * Set if a element is tabbable or not

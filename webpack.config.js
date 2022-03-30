@@ -18,16 +18,29 @@ var config = {
         loader: 'babel-loader'
       },
       {
-        test: /\.(scss)$/,
-        use: [{
-          loader: 'style-loader', // inject CSS to page
-        }, 
-        {
-          loader: 'css-loader', // translates CSS into CommonJS modules
-        },  
-        {
-          loader: 'sass-loader' // compiles Sass to CSS
-        }]
+      //   test: /\.(scss|css)$/,
+      //   use: ['style-loader', 'css-loader', 'sass-loader'],
+      //   include: path.join(__dirname, 'src/styles')
+      // //   use: [{
+      // //     loader: 'style-loader', // inject CSS to page
+      // //   }, 
+      // //   {
+      // //     loader: 'css-loader', // translates CSS into CommonJS modules
+      // //   },  
+      // //   {
+      // //     loader: 'sass-loader' // compiles Sass to CSS
+      // //   }]
+      // },
+      
+        test: /\.scss$/i,
+        use: [
+          MiniCssExtractPlugin.loader,
+          "css-loader",
+          {
+            loader: "postcss-loader",
+          },
+          "sass-loader"
+        ]
       },
       {
         test: /\.(eot|svg|ttf|woff|woff2)$/,
@@ -38,11 +51,13 @@ var config = {
         }
       }
     ]
-  },
-  plugins: [new MiniCssExtractPlugin({
+  }
+  ,
+  plugins: [
+    new MiniCssExtractPlugin({
     filename: "h5p-single-choice-set.css"
-  })
-]
+      })
+    ]
 };
 
 if(isDev) {
