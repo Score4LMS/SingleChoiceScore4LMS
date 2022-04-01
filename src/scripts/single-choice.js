@@ -16,7 +16,7 @@ export default class SingleChoice extends EventDispatcher {
    * @param {number} id
    * @param {boolean} autoCheck
    */
-  constructor (options, index, id, autoCheck, descConst) {
+  constructor (options, index, id, autoCheck, descConst = false) {
     super();
     
     // Extend defaults with provided options
@@ -55,108 +55,57 @@ export default class SingleChoice extends EventDispatcher {
    */
   appendTo ($container, isCurrent) {
     const questionId = `single-choice-${this.id}-question-${this.index}`;
-    //const testId = `single-choice-${this.id}-test-${this.index}`;
     this.$container = $container;
 
-    this.$choice = $('<div>', {
-      'class': 'h5p-sc-slide h5p-sc' + (isCurrent ? ' h5p-sc-current-slide' : ''),
-      css: {'left': (this.index * 100) + '%'}
-    });
-  
-  
-  //console.log("this.options in single choice+++++++++++++++++++++++++++");
-    // console.log(this.options.desc1);
-    // console.log(this.options.question);
-  //if(this.options.desc1 !== undefined){
-    this.$choice.append($('<div>', {
-      'html': this.options.desc1 +'<br>'// +  this.options.Notation
-    }));
-    
-    
-     // var vse = new VerovioScoreEditor(this.$choice, null, this.options.Notation);
-           // this.vse = new VerovioScoreEditor(this.container.firstChild, null, this.setMei)
-          //  console.log(vse);
-   
-    //$choice[0].classList.add("vse-container");
-   
-       // var vse = new VSE.VerovioScoreEditor($choice, this.options.Notation); // just initialize transpiled ts
-       /* vse.init().then(() => {
-            var smHandler = this.vse.getCore().getInsertHandler().getSMHandler()
-            that.on("enterFullScreen", smHandler.removeFunction)
-            that.on("enterFullScreen", smHandler.drawFunction)
-            that.on("exitFullScreen", smHandler.removeFunction)
-            that.on("exitFullScreen", smHandler.drawFunction)
-        })
-    */
-    console.log(this.options.Notation);
-    
-   // else{
-  /* this.$choice.append($('<div>', {
-      'id': questionId,
-      'class': 'h5p-sc-question',
-      'html': '<br>'+this.options.desc1//+ this.options.Notation +'<br>' 
-    }));*/
-    //console.log("wenn nicht undefined+++++++++++++++++++++++++++");
-   // console.log(this.options.Notation);
-    //this.options.Notation.getElementById(questionId).querySelector("#rootSVG");
-//}
-  
-// if(this.options.question !== ''){
-  this.$choice.append($('<div>', {
-      'id': questionId,
-      'class': 'h5p-sc-question',
-      'html': this.options.question
+    // desc content should be shown all the time
+    if(this.descConst === "descContent"){
+      this.$choice = $('<div>', {
+        'class': 'h5p-sc-slide h5p-sc h5p-sc-current-slide h5p-sc-question',
+        css: {'left': "0%"}
+      });
+      this.$choice.append($('<div>', {
+        'html': this.options.desc1 +'<br>'
+      }));  
+    }else{ // this is only important for questions
+      this.$choice = $('<div>', {
+        'class': 'h5p-sc-slide h5p-sc' + (isCurrent ? ' h5p-sc-current-slide' : ''),
+        css: {'left': (this.index * 100) + '%'}
+      });
       
-    })); 
-   
- 
-// }
- //else{
-      /*  this.$choice.append($('<div>', {
-      'id': questionId,
-      'class': 'h5p-sc-question',
-      'html': '<br>'+this.options.question
-      
-    })); */
- //  console.log("wenn nicht empty+++++++++++++++++++++++++++");
-    
- //}
+      this.$choice.append($('<div>', {
+        'id': questionId,
+        'class': 'h5p-sc-question',
+        'html': this.options.question
+        
+      })); 
 
-    /*console.log("appendTo+++++++++++++++++++++++++++");
-    console.log(this.options.question);
-    console.log(this.options);*/
+      var $alternatives = $('<ul>', {
+        'class': 'h5p-sc-alternatives',
+        'role': 'radiogroup',
+        'aria-labelledby': questionId
+      });
 
-    var $alternatives = $('<ul>', {
-      'class': 'h5p-sc-alternatives',
-      'role': 'radiogroup',
-      'aria-labelledby': questionId
-    });
-
-    this.$nextButton = $('<button>', {
-      html: 'Next',
-      'class': 'h5p-joubelui-button h5p-question-next',
-      'aria-disabled': 'true',
-      'tabindex': '-1',
-      'click': () => {
-        if(this.$nextButton.attr('aria-disabled') !== 'true') {
-          this.toggleNextButton(false);
-          this.checkAnswer();
+      this.$nextButton = $('<button>', {
+        html: 'Next',
+        'class': 'h5p-joubelui-button h5p-question-next',
+        'aria-disabled': 'true',
+        'tabindex': '-1',
+        'click': () => {
+          if(this.$nextButton.attr('aria-disabled') !== 'true') {
+            this.toggleNextButton(false);
+            this.checkAnswer();
+          }
         }
+      }).toggle(!this.autoCheck);
+      
+      if(this.options.answers !== false){
+          this.alternativeElements = this.options.answers.map(opts => this.createAlternativeElement(opts));
+          $alternatives.append(this.alternativeElements);
+          this.$choice.append($alternatives);
       }
-    }).toggle(!this.autoCheck);
-    
-/*console.log('**************Answers');    
-console.log(this.options.answers);*/
-if(this.options.answers !== false){
+    }
 
-     this.alternativeElements = this.options.answers.map(opts => this.createAlternativeElement(opts));
-
-    
-
-    
-}
-$alternatives.append(this.alternativeElements);
-   this.$choice.append($alternatives);
+    //append all tot their destination containers
     this.$choice.append(this.$nextButton);
     $container.append(this.$choice);
     return this.$choice;

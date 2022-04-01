@@ -37,15 +37,22 @@
                 },
                 
                 {
-                    
                     "name": "Notation",
-                    "type": "text",
-                    "description": "Add Notation",
-                    "optional": true,
-                    "default": "000000",
-                    "widget": "notationWidget"
-             
-                }  
+                    "type": "group",
+                    "label": "Notation",
+                   
+                    "expanded": true,
+                    "fields": [
+                        {
+                            "name": "notationWidget",
+                            "type": "text",
+                            "description": "Add Notation",
+                            "optional": true,
+                            "default": "000000",
+                            "widget": "notationWidget"
+                        }
+                    ]
+                } 
             ]
         }
     },
@@ -108,17 +115,25 @@
                     "label": "Question",
                     "importance": "high"
                 },
-                
+
                 {
-                   
                     "name": "question_notation",
-                    "type": "text",
-                    "description": "Add Notation",
-                    "optional": true,
-                    "default": "000000",
-                    "widget": "notationWidget"
-                     
+                    "type": "group",
+                    "label": "Notation",
+                   
+                    "expanded": true,
+                    "fields": [
+                        {
+                            "name": "notationWidget",
+                            "type": "text",
+                            "description": "Add Notation",
+                            "optional": true,
+                            "default": "000000",
+                            "widget": "notationWidget"
+                        }
+                    ]
                 },  
+
                 
                 {
                     "name": "answers",

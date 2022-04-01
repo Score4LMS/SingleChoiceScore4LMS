@@ -29,8 +29,8 @@ export default class ResultSlide extends EventDispatcher {
     }).append($resultContainer);
     
     
-    console.log("Result Slide****************");
-        console.log(this);
+    // console.log("Result Slide****************");
+    //     console.log(this);
     
   }
 

@@ -10,6 +10,7 @@ import {
     jQuery as $, JoubelUI as UI, Question
 }
 from "./globals";
+import { compose } from 'h5p-lib-controls/src/scripts/utils/functional';
 
 const S4L = (function () {
     /**
@@ -20,10 +21,8 @@ const S4L = (function () {
      * @param {Object} contentData H5P instance data
      */
     function Score4LMS(options, contentId, contentData) {
-
-        //frames can only be adjusted, when content has loaded successfully
-        $(this.adjustFrame.bind(this))
-
+        this.currentAttachedElement = undefined
+        this.usedIds = []
         var self = this;
         
         // Extend defaults with provided options
@@ -96,6 +95,8 @@ const S4L = (function () {
 
         //array of containers for later scaling
         this.vseContainer = [];
+
+        this.vseInstances = []
         
         /**
          * The solution dialog
@@ -129,23 +130,24 @@ const S4L = (function () {
         for (var i = 0; i < this.options.descriptions.length; i++) {
         
          
-            var choice = new SingleChoice(this.options.descriptions[i], i, this.contentId, self.options.behaviour.autoCheck, 'descContent');
+            var choice = new SingleChoice(this.options.descriptions[i], i, this.contentId, self.options.behaviour.autoCheck, "descContent");
             //choice.on('finished', this.handleQuestionFinished, this);
             //choice.on('alternative-selected', this.handleAlternativeSelected, this);
             
-            choice.appendTo(this.$container, (i === this.currentIndex));
+            choice.appendTo(this.$container, true);
             // this.choices.push(choice);
             // this.$slides.push(choice.$choice);
             
             var indexDesc = this.options.descriptions[i];
-            //var vse = new VerovioScoreEditor(this.$choices[0], {data: indexDesc.Notation});
             if(indexDesc.Notation != undefined){
                 var $vseDesc = $('<div>',{
                     'id': 'vseDesc' + i.toString()
                 })
                 var vse = new VerovioScoreEditor($vseDesc[0], {data: indexDesc.Notation});
+
                 $vseDesc.appendTo(this.$container, (i === this.currentIndex))
                 this.vseContainer.push($vseDesc[0])
+                this.vseInstances.push(vse)
             }
         }
         
@@ -160,7 +162,6 @@ const S4L = (function () {
             choice.appendTo(this.$choices, (i === this.currentIndex));
             this.choices.push(choice);
             this.$slides.push(choice.$choice);
-            console.log("CHOICE", choice)
             var indexDesc = this.options.choices[i];
             //var vse = new VerovioScoreEditor(this.$choices[0], {data: indexDesc.Notation});
             if(indexDesc.question_notation != undefined){
@@ -170,6 +171,7 @@ const S4L = (function () {
                 var vse = new VerovioScoreEditor($vseChoice[0], {data: indexDesc.question_notation});
                 this.vseContainer.push($vseChoice[0])
                 $vseChoice.appendTo(choice.$choice)
+                this.vseInstances.push(vse)
             }
         }
         
@@ -222,6 +224,11 @@ const S4L = (function () {
                 return this;
             };
         })();
+
+         //when everything has loaded successfully frames and svgs should beadjusted
+         $(this.adjustFrame.bind(this))
+         $(this.loadObservers.bind(this))
+ 
     }
     
     Score4LMS.prototype = Object.create(Question.prototype);
@@ -229,23 +236,110 @@ const S4L = (function () {
     Score4LMS.prototype. constructor = Score4LMS;
 
     /**
-     * Adjust an its contents when all content is loaded
+     * Adjust its contents when all content is loaded
      */
     Score4LMS.prototype.adjustFrame = function(){
        
-        this.vseContainer.forEach(vc => vc.style.height = "500px")
+        this.vseContainer.forEach(vc => {
+            vc.style.height = "250px" // todo: make more responsive (for now all all vse containers are 250px high)
+        })
         var h5pContainer = document.querySelector(".h5p-container")
         var showChildren = h5pContainer.querySelectorAll(".h5p-sc-set > *, .h5p-actions, .vse-container, .h5p-sc")
         var h5pContainerHeight = 0
         showChildren.forEach(sc => {
             h5pContainerHeight += sc.getBoundingClientRect().height
-            console.log("HEIGHT", h5pContainerHeight)
-            sc.style.position = "relative"
+            sc.style.position = "relative" // very important, so that the containers are displayed in a column
         })
         h5pContainer.style.height =  h5pContainerHeight.toString() + "px"
         window.frameElement.style.height =  h5pContainerHeight.toString() + "px"
     }
+
+    /**
+     * Load obeservers for changes in the dom, so that parameters of the vse can be updated 
+     */
+    Score4LMS.prototype.loadObservers = function(){
+        var that = this
+        // do all the important vse stuff, when vse is properly loaded and attached
+        var domAttachObserver = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                Array.from(mutation.addedNodes).forEach(an => {
+                    var _a;
+                    if (an.constructor.name.toLowerCase().includes("element")) {
+                        var ae = an;
+                        if (ae.closest(".vse-container") !== null) {
+                            if (((_a = that.currentAttachedElement) === null || _a === void 0 ? void 0 : _a.id) != ae.closest(".vse-container").id) {
+                                that.currentAttachedElement = ae.closest(".vse-container");
+                                that.vseInstances.forEach(vi => {
+                                    if(vi.container.id === that.currentAttachedElement.id && !that.usedIds.includes(that.currentAttachedElement.id)){
+                                        if(vi.getCore() != undefined){
+                                            if(vi.getCore().getCurrentMEI(true) != undefined){
+                                                that.usedIds.push(that.currentAttachedElement.id)
+                                                that.currentAttachedElement.dispatchEvent(new Event("containerAttached"));
+                                                that.configureVSE(vi)
+                                            }
+                                        }
+                                    }
+                                })
+                            }
+                        }
+                    }
+                });
+            });
+        });
+
+        domAttachObserver.observe(document, {
+            childList: true,
+            subtree: true
+        });
+
+        // reload the size of the svg in current slide, since the viewbox is initally 0 0 0 0
+        var currentSlideObserver = new MutationObserver(function (mutations){
+            mutations.forEach(function(mutation){
+               if(mutation.attributeName === "class"){
+                   var target = mutation.target
+                   if(target.classList.contains("h5p-sc-current-slide")){
+                       var vseContainer = target.querySelector(".vse-container")
+                       if(vseContainer === null) return
+                        that.vseInstances.forEach(vi => {
+                            if(vi.container.id === vseContainer.id){
+                                var core = vi.getCore()
+                                core.setStyleOptions({".system": {"transform": ["scale(2.5)"]}}) // todo: make scale more responsive
+                                core.setHideUX(true)
+                                core.loadData("", core.getCurrentMEI(false), false, "svg_output")
+                            }
+                        })
+                   }
+               }
+            })
+        })
+
+        document.querySelectorAll(".h5p-sc-slide").forEach(q => {
+            currentSlideObserver.observe(q, {
+                attributes: true
+            })
+        })
+        
+    }
     
+    /**
+     * Configure the vse parameters as given by the core interfacing methods
+     * @param {*} vseInstance 
+     */
+    Score4LMS.prototype.configureVSE = function(vseInstance){
+        this.vseInstance = vseInstance
+        var vseContainer = document.getElementById(vseInstance.container.id)
+        // vseContainer.querySelectorAll("#sidebarContainer, #btnToolbar, #customToolbar, #interactionOverlay").forEach(tb => tb.style.setProperty("display" ,"none", "important"))
+        var core = this.vseInstance.getCore()
+        var toolkit = core.getVerovioWrapper().getToolkit()
+        // toolkit.setOptions({ // here we could set some options for verovio if needed
+
+        // })
+        core.setStyleOptions({".system": {"transform": ["scale(2.5)"]}}) // todo: make scale more responsive
+        core.setHideUX(true)
+        core.loadData("", core.getCurrentMEI(false), false, "svg_output")
+
+    }
+
     /**
      * Set if a element is tabbable or not
      *
@@ -521,13 +615,17 @@ const S4L = (function () {
         this.addButtons();
         
         // Insert feedback and buttons section on the result slide
-        this.insertSectionAtElement('feedback', this.resultSlide.$feedbackContainer);
+        // Feedback and scorebar should be always initailized together since they are updated together in Question class
+        this.insertSectionAtElement('feedback', this.resultSlide.$feedbackContainer); 
+        this.insertSectionAtElement('scorebar', this.resultSlide.$feedbackContainer); 
         this.insertSectionAtElement('buttons', this.resultSlide.$buttonContainer);
         
         // Question is finished
         if (this.options.choices.length === this.currentIndex) {
             this.trigger('question-finished');
         }
+
+        this.trigger('resize')
     };
     
     /**
@@ -598,9 +696,9 @@ const S4L = (function () {
         // Hide all other slides than the current one:
         self.$container.addClass('initialized');
         
-        console.log("createQuestion+++++++++++++");
-        console.log(self);
-        console.log(self.$container);
+        // console.log("createQuestion+++++++++++++");
+        // console.log(self);
+        // console.log(self.$container);
         
         return self.$container;
     };

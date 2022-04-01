@@ -27,7 +27,7 @@
     "postcss-loader": "^6.2.1",
     "sass-loader": "^12.6.0",
     "style-loader": "^3.3.1",
-    "verovioscoreeditor": "^1.2.5",
+    "verovioscoreeditor": "^1.2.7",
     "webpack": "^5.70.0",
     "webpack-cli": "^4.9.2"
   }
