@@ -18,6 +18,25 @@ var config = {
         loader: 'babel-loader'
       },
       {
+        test: /\.scss$/,
+       
+          use: [
+          {
+          loader: 'style-loader' // inject CSS to page
+        }, 
+            {
+              loader: "css-loader"
+            },
+            {
+              loader: "resolve-url-loader"
+            },
+            {
+              loader: "sass-loader"
+            }
+          ]
+
+      },
+     /* {
         test: /\.(scss)$/,
         use: [{
           loader: 'style-loader', // inject CSS to page
@@ -28,7 +47,7 @@ var config = {
         {
           loader: 'sass-loader' // compiles Sass to CSS
         }]
-      },
+      },*/
       {
         test: /\.(eot|svg|ttf|woff|woff2)$/,
         include: path.join(__dirname, 'src/fonts'),
