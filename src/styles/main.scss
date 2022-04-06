@@ -1,3 +1,26 @@
+@import '~verovioscoreeditor/src/styles/VerovioScoreEditor.css';
+
+
+/*
+OWN CSS
+*/
+.h5p-sc-set {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  display: flex;
+}
+
+.h5p-sc-set > *{
+  flex-grow: 1 !important;
+  flex-basis: auto !important;
+}
+
+.h5p-notation-widget{
+  height: 500px !important;
+}
+
+/*//////////////////*/
+
 .h5p-container.h5p-single-choice-set {
   overflow: hidden;
 }
@@ -42,10 +65,11 @@
   top: 0;
   padding-bottom: .5em;
 }
+
 .initialized .h5p-sc-slide {
   display: none;
-  
 }
+
 .initialized .h5p-sc-slide.h5p-sc-current-slide {
   display: block;
 }

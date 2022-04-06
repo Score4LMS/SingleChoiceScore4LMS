@@ -18,13 +18,13 @@
             "name": "desc",
             "type": "group",
             "isSubContent": true,
-            "label": "Desc",
+            "label": "Description",
             "importance": "high",
             "expanded": true,
             "fields": [
                 {
                     "name": "desc1",
-                    "label": "Desc1",
+                    "label": "Description",
                     "type": "text",
                     "tags": [
                         "p",
@@ -52,25 +52,7 @@
                             "widget": "notationWidget"
                         }
                     ]
-                }
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
+                } 
             ]
         }
     },
@@ -133,6 +115,25 @@
                     "label": "Question",
                     "importance": "high"
                 },
+
+                {
+                    "name": "question_notation",
+                    "type": "group",
+                    "label": "Notation",
+                   
+                    "expanded": true,
+                    "fields": [
+                        {
+                            "name": "notationWidget",
+                            "type": "text",
+                            "description": "Add Notation",
+                            "optional": true,
+                            "default": "000000",
+                            "widget": "notationWidget"
+                        }
+                    ]
+                },  
+
                 
                 {
                     "name": "answers",

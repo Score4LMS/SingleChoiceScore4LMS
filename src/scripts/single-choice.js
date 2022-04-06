@@ -1,8 +1,13 @@
 import { jQuery as $, EventDispatcher, shuffleArray } from "./globals";
 import Controls from 'h5p-lib-controls/src/scripts/controls';
 import UIKeyboard from 'h5p-lib-controls/src/scripts/ui/keyboard';
+//import VerovioScoreEditor from 'verovioscoreeditor';
 
 export default class SingleChoice extends EventDispatcher {
+
+
+ //const VSE = require('verovioscoreeditor');
+
   /**
    * Constructor function.
    * @constructor
@@ -11,9 +16,9 @@ export default class SingleChoice extends EventDispatcher {
    * @param {number} id
    * @param {boolean} autoCheck
    */
-  constructor (options, index, id, autoCheck, descConst) {
+  constructor (options, index, id, autoCheck, descConst = false) {
     super();
-
+    
     // Extend defaults with provided options
     this.options = $.extend(true, {}, {
       question: '',
@@ -32,7 +37,7 @@ export default class SingleChoice extends EventDispatcher {
     // add keyboard controls
     this.controls = new Controls([new UIKeyboard()]);
     this.controls.on('select', this.handleAlternativeSelected, this);
-
+   
     // create config
     this.options.answers = shuffleArray(this.options.answers.map((answer, index) => ({
       text: this.options.answers[index],
@@ -40,7 +45,8 @@ export default class SingleChoice extends EventDispatcher {
       answerIndex: index
     })));
   }
-
+  
+   
   /**
    * appendTo function invoked to append SingleChoice to container
    *
@@ -48,51 +54,62 @@ export default class SingleChoice extends EventDispatcher {
    * @param {boolean} isCurrent Current slide we are on
    */
   appendTo ($container, isCurrent) {
-
     const questionId = `single-choice-${this.id}-question-${this.index}`;
     this.$container = $container;
 
-    this.$choice = $('<div>', {
-      'class': 'h5p-sc-slide h5p-sc' + (isCurrent ? ' h5p-sc-current-slide' : ''),
-      css: {'left': (this.index * 100) + '%'}
-    });
+    // desc content should be shown all the time
+    if(this.descConst === "descContent"){
+      this.$choice = $('<div>', {
+        'class': 'h5p-sc-slide h5p-sc h5p-sc-current-slide h5p-sc-question',
+        css: {'left': "0%"}
+      });
+      this.$choice.append($('<div>', {
+        'html': this.options.desc1 +'<br>'
+      }));  
+    }else{ // this is only important for questions
+      this.$choice = $('<div>', {
+        'class': 'h5p-sc-slide h5p-sc' + (isCurrent ? ' h5p-sc-current-slide' : ''),
+        css: {'left': (this.index * 100) + '%'}
+      });
+      
+      this.$choice.append($('<div>', {
+        'id': questionId,
+        'class': 'h5p-sc-question',
+        'html': this.options.question
+        
+      })); 
 
+      var $alternatives = $('<ul>', {
+        'class': 'h5p-sc-alternatives',
+        'role': 'radiogroup',
+        'aria-labelledby': questionId
+      });
 
-    this.$choice.append($('<div>', {
-      'id': questionId,
-      'class': 'h5p-sc-question',
-      'html': this.descConst[0].innerHTML + this.options.question //
-    }));
-
-    var $alternatives = $('<ul>', {
-      'class': 'h5p-sc-alternatives',
-      'role': 'radiogroup',
-      'aria-labelledby': questionId
-    });
-
-    this.$nextButton = $('<button>', {
-      html: 'Next',
-      'class': 'h5p-joubelui-button h5p-question-next',
-      'aria-disabled': 'true',
-      'tabindex': '-1',
-      'click': () => {
-        if(this.$nextButton.attr('aria-disabled') !== 'true') {
-          this.toggleNextButton(false);
-          this.checkAnswer();
+      this.$nextButton = $('<button>', {
+        html: 'Next',
+        'class': 'h5p-joubelui-button h5p-question-next',
+        'aria-disabled': 'true',
+        'tabindex': '-1',
+        'click': () => {
+          if(this.$nextButton.attr('aria-disabled') !== 'true') {
+            this.toggleNextButton(false);
+            this.checkAnswer();
+          }
         }
+      }).toggle(!this.autoCheck);
+      
+      if(this.options.answers !== false){
+          this.alternativeElements = this.options.answers.map(opts => this.createAlternativeElement(opts));
+          $alternatives.append(this.alternativeElements);
+          this.$choice.append($alternatives);
       }
-    }).toggle(!this.autoCheck);
+    }
 
-    this.alternativeElements = this.options.answers.map(opts => this.createAlternativeElement(opts));
-
-    $alternatives.append(this.alternativeElements);
-
-    this.$choice.append($alternatives);
+    //append all tot their destination containers
     this.$choice.append(this.$nextButton);
     $container.append(this.$choice);
     return this.$choice;
   };
- 
 
   /**
    * Focus on an alternative by index
