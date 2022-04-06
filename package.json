@@ -10,7 +10,8 @@
   },
   "scripts": {
     "build": "./node_modules/.bin/webpack",
-    "watch": "./node_modules/.bin/webpack --watch"
+    "watch": "./node_modules/.bin/webpack --watch --mode=development",
+    "analyze": "./node_modules/.bin/webpack --mode=production --profile --json > stats.json"
   },
   "keywords": [],
   "author": "",
@@ -29,6 +30,7 @@
     "style-loader": "^3.3.1",
     "verovioscoreeditor": "^1.2.7",
     "webpack": "^5.70.0",
+    "webpack-bundle-analyzer": "^4.5.0",
     "webpack-cli": "^4.9.2"
   }
 }

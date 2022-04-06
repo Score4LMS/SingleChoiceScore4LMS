@@ -2,6 +2,7 @@ var path = require('path');
 var nodeEnv = process.env.NODE_ENV || 'development';
 var isDev = (nodeEnv !== 'production');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const WebpackBundleAnalyzer = require('webpack-bundle-analyzer')
 
 var config = {
   entry: {
@@ -17,21 +18,7 @@ var config = {
         test: /\.js$/,
         loader: 'babel-loader'
       },
-      {
-      //   test: /\.(scss|css)$/,
-      //   use: ['style-loader', 'css-loader', 'sass-loader'],
-      //   include: path.join(__dirname, 'src/styles')
-      // //   use: [{
-      // //     loader: 'style-loader', // inject CSS to page
-      // //   }, 
-      // //   {
-      // //     loader: 'css-loader', // translates CSS into CommonJS modules
-      // //   },  
-      // //   {
-      // //     loader: 'sass-loader' // compiles Sass to CSS
-      // //   }]
-      // },
-      
+      {      
         test: /\.scss$/i,
         use: [
           MiniCssExtractPlugin.loader,
@@ -56,7 +43,8 @@ var config = {
   plugins: [
     new MiniCssExtractPlugin({
     filename: "h5p-single-choice-set.css"
-      })
+      }),
+      new WebpackBundleAnalyzer.BundleAnalyzerPlugin()
     ]
 };
 

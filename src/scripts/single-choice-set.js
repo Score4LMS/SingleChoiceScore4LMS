@@ -327,8 +327,6 @@ const S4L = (function () {
      */
     Score4LMS.prototype.configureVSE = function(vseInstance){
         this.vseInstance = vseInstance
-        var vseContainer = document.getElementById(vseInstance.container.id)
-        // vseContainer.querySelectorAll("#sidebarContainer, #btnToolbar, #customToolbar, #interactionOverlay").forEach(tb => tb.style.setProperty("display" ,"none", "important"))
         var core = this.vseInstance.getCore()
         var toolkit = core.getVerovioWrapper().getToolkit()
         // toolkit.setOptions({ // here we could set some options for verovio if needed
