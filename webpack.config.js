@@ -18,36 +18,30 @@ var config = {
         loader: 'babel-loader'
       },
       {
-        test: /\.scss$/,
-       
-          use: [
+      //   test: /\.(scss|css)$/,
+      //   use: ['style-loader', 'css-loader', 'sass-loader'],
+      //   include: path.join(__dirname, 'src/styles')
+      // //   use: [{
+      // //     loader: 'style-loader', // inject CSS to page
+      // //   }, 
+      // //   {
+      // //     loader: 'css-loader', // translates CSS into CommonJS modules
+      // //   },  
+      // //   {
+      // //     loader: 'sass-loader' // compiles Sass to CSS
+      // //   }]
+      // },
+      
+        test: /\.scss$/i,
+        use: [
+          MiniCssExtractPlugin.loader,
+          "css-loader",
           {
-          loader: 'style-loader' // inject CSS to page
-        }, 
-            {
-              loader: "css-loader"
-            },
-            {
-              loader: "resolve-url-loader"
-            },
-            {
-              loader: "sass-loader"
-            }
-          ]
-
+            loader: "postcss-loader",
+          },
+          "sass-loader"
+        ]
       },
-     /* {
-        test: /\.(scss)$/,
-        use: [{
-          loader: 'style-loader', // inject CSS to page
-        }, 
-        {
-          loader: 'css-loader', // translates CSS into CommonJS modules
-        },  
-        {
-          loader: 'sass-loader' // compiles Sass to CSS
-        }]
-      },*/
       {
         test: /\.(eot|svg|ttf|woff|woff2)$/,
         include: path.join(__dirname, 'src/fonts'),
@@ -57,11 +51,13 @@ var config = {
         }
       }
     ]
-  },
-  plugins: [new MiniCssExtractPlugin({
+  }
+  ,
+  plugins: [
+    new MiniCssExtractPlugin({
     filename: "h5p-single-choice-set.css"
-  })
-]
+      })
+    ]
 };
 
 if(isDev) {

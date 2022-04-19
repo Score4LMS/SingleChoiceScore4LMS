@@ -16,7 +16,7 @@ OWN CSS
 }
 
 .h5p-notation-widget{
-  height: 500px !important;
+  height: 400px !important;
 }
 
 /*//////////////////*/
@@ -30,8 +30,12 @@ OWN CSS
 }
 .h5p-sc-set-wrapper.initialized {
   overflow: hidden;
-  -ms-scroll-limit: 0 0 0 0; /* IE11 bugfix for where this element can be out of line, when focusing on elements. */
+  overflow-y: scroll;
+  border:1px solid black;
   height: 100%;
+  padding-top: 10px;
+  padding-right: 30px;
+  padding-left: 30px;
 }
 .h5p-sc-set {
   height: 100%;
@@ -68,10 +72,12 @@ OWN CSS
 
 .initialized .h5p-sc-slide {
   display: none;
+  
 }
 
 .initialized .h5p-sc-slide.h5p-sc-current-slide {
   display: block;
+  padding-top: 10px;
 }
 
 ul.h5p-sc-alternatives {
@@ -343,7 +349,7 @@ li.h5p-sc-alternative .h5p-sc-status {
   margin: 0.888888889em;
   padding-right: 1.777777778em;
   font-size: 1.125em;
-  height: auto;
+  height: 5%;
 }
 
 .h5p-single-choice-set .h5p-sc-question p {

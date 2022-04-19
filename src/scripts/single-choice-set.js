@@ -92,6 +92,7 @@ const S4L = (function () {
         this.$slides =[];
         // An array containing the SingleChoice instances
         this.choices =[];
+        this.desc =[];
 
         //array of containers for later scaling
         this.vseContainer = [];
@@ -109,8 +110,16 @@ const S4L = (function () {
             self.focusButton();
         });
         
+        const testId2 = `single-choice-WP5-${this.id}-test2-${this.index}`;
+        
         this.$choices = $('<div>', {
             'class': 'h5p-sc-set h5p-sc-animate'
+        });
+        
+        this.$desc = $('<div>', {
+            'id':  testId2,
+            'class': 'h5p-sc-set h5p-sc-animate'
+
         });
         
         // sometimes an empty object is in the choices
@@ -121,24 +130,22 @@ const S4L = (function () {
         var numQuestions = this.options.choices.length;
         
         // Create progressbar
-        self.progressbar = UI.createProgressbar(numQuestions + 1, {
+        self.progressbar = UI.createProgressbar(numQuestions, {
             progressText: this.l10n.slideOfTotal
         });
         self.progressbar.setProgress(this.currentIndex);
+       
+        console.log("For5++++++++++++++++++++");
         
-        
+        if(this.options.descriptions !== undefined){
         for (var i = 0; i < this.options.descriptions.length; i++) {
-        
-         
+             
+            var indexDesc = this.options.descriptions[i];
+                
             var choice = new SingleChoice(this.options.descriptions[i], i, this.contentId, self.options.behaviour.autoCheck, "descContent");
-            //choice.on('finished', this.handleQuestionFinished, this);
-            //choice.on('alternative-selected', this.handleAlternativeSelected, this);
             
             choice.appendTo(this.$container, true);
-            // this.choices.push(choice);
-            // this.$slides.push(choice.$choice);
-            
-            var indexDesc = this.options.descriptions[i];
+           
             if(indexDesc.Notation != undefined){
                 var $vseDesc = $('<div>',{
                     'id': 'vseDesc' + i.toString()
@@ -150,32 +157,50 @@ const S4L = (function () {
                 this.vseInstances.push(vse)
             }
         }
+        }
         
-        
-       //console.log(H5PEditor.widgets.notationWidget);
-       //console.log(document);
-          
+         
         for (var i = 0; i < this.options.choices.length; i++) {
-            var choice = new SingleChoice(this.options.choices[i], i, this.contentId, self.options.behaviour.autoCheck);
-           // choice.on('finished', this.handleQuestionFinished, this);
-           // choice.on('alternative-selected', this.handleAlternativeSelected, this);
-           choice.appendTo(this.$choices, (i === this.currentIndex));
-           // this.choices.push(choice);
-           // this.$slides.push(choice.$choice);
-            var indexDesc = this.options.choices[i];
-            //var vse = new VerovioScoreEditor(this.$choices[0], {data: indexDesc.Notation});
-            console.log("Auskommenirt!!!!!!!!!!!!!!!!!!!!!!!!");
-           /* if(indexDesc.question_notation != undefined){
+        
+          var choice = new SingleChoice(this.options.choices[i], i, this.contentId, self.options.behaviour.autoCheck, "choiceContent");            
+          choice.on('finished', this.handleQuestionFinished, this);
+          choice.on('alternative-selected', this.handleAlternativeSelected, this);
+         //console.log("this.currentIndex");
+         //console.log(this.currentIndex);
+         choice.appendTo(this.$container, true, numQuestions);
+          //choice.appendTo(this.$container, i === this.currentIndex, numQuestions);
+            //this.choices.push(choice);
+            //this.$slides.push(choice.$choice);
+            
+             var indexDesc = this.options.choices[i];
+            if(indexDesc.question_notation != undefined){
                 var $vseChoice = $('<div>',{
                     'id': 'vseChoice' + i.toString()
                 })
                 var vse = new VerovioScoreEditor($vseChoice[0], {data: indexDesc.question_notation});
-                $vseChoice.appendTo(choice.$choice)
                 this.vseContainer.push($vseChoice[0])
-                
+                $vseChoice.appendTo(choice.$choice)
                 this.vseInstances.push(vse)
-            }*/
+            }
+            
+            
+  //style="transform: scale(2.5);"         
+            var choice = new SingleChoice(this.options.choices[i], i, this.contentId, self.options.behaviour.autoCheck, "choice");
+            choice.on('finished', this.handleQuestionFinished, this);
+            choice.on('alternative-selected', this.handleAlternativeSelected, this);
+             //console.log("this.currentIndex2");
+        // console.log(this.currentIndex);
+            choice.appendTo(this.$container, true, numQuestions);
+            this.choices.push(choice);
+            this.$slides.push(choice.$choice);
+           
         }
+        
+                this.$choices.append($('<div>', {
+     
+      'html':  ""
+    }));
+    
         
         this.resultSlide = new ResultSlide(this.options.choices.length);
         this.resultSlide.appendTo(this.$choices);
@@ -243,7 +268,7 @@ const S4L = (function () {
     Score4LMS.prototype.adjustFrame = function(){
        
         this.vseContainer.forEach(vc => {
-            vc.style.height = "250px" // todo: make more responsive (for now all all vse containers are 250px high)
+            vc.style.height = "130px" // todo: make more responsive (for now all all vse containers are 250px high)
         })
         var h5pContainer = document.querySelector(".h5p-container")
         var showChildren = h5pContainer.querySelectorAll(".h5p-sc-set > *, .h5p-actions, .vse-container, .h5p-sc")
@@ -745,7 +770,7 @@ const S4L = (function () {
      */
     Score4LMS.prototype.move = function (index) {
         var self = this;
-        if (index === this.currentIndex) {
+        if (index === self.currentIndex) {
             return;
         }
         

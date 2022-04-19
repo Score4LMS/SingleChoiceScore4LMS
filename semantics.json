@@ -5,8 +5,7 @@
         "label": "Task descriptions",
         "optional": true,
         "entity": "descriptions",
-        "min": 1,
-        "defaultNum": 1,
+        "min": 0,
         "description": "A guide telling the user how to answer this task",
         "widgets": [
             {
@@ -57,44 +56,19 @@
         }
     },
     {
-        "name": "Task Content",
-        "type": "select",
-        "label": "Task Content",
-        "widget": "select",
-        "alignment": "horizontal",
-        "description": "Select type of task",
-        "options": [
-            {
-                "value": "SingleChoice",
-                "label": "Single Choice"
-            },
-            {
-                "value": "MultipleChoice",
-                "label": "Multiple Choice"
-            }
-        ]
-    },
-    {
         "name": "choices",
         "type": "list",
         "label": "List of questions",
         "importance": "high",
         "entity": "question",
         "min": 1,
-        "defaultNum": 1,
+        "defaultNum": 0,
         "widgets": [
             {
                 "name": "VerticalTabs",
                 "label": "Default"
             }
         ],
-        "widget": "showWhen",
-        "showWhen": {"rules": [
-            {
-                "field": "Task Content",
-                "equals": "SingleChoice"
-            }
-        ]},
         "field": {
             "name": "choice",
             "type": "group",
@@ -162,24 +136,11 @@
         }
     },
     {
-        "name": "introductionImageAltText",
-        "type": "text",
-        "label": "Alternative text for introduction image",
-        "optional": true,
-        "widget": "showWhen",
-        "showWhen": {"rules": [
-            {
-                "field": "Task Content",
-                "equals": "MultipleChoice"
-            }
-        ]}
-    },
-    {
         "name": "overallFeedback",
         "type": "group",
         "label": "Overall Feedback",
         "importance": "low",
-        "expanded": true,
+        "expanded": false,
         "fields": [
             {
                 "name": "overallFeedback",

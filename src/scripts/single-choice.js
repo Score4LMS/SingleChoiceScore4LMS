@@ -1,7 +1,6 @@
 import { jQuery as $, EventDispatcher, shuffleArray } from "./globals";
 import Controls from 'h5p-lib-controls/src/scripts/controls';
 import UIKeyboard from 'h5p-lib-controls/src/scripts/ui/keyboard';
-//import VerovioScoreEditor from 'verovioscoreeditor';
 
 export default class SingleChoice extends EventDispatcher {
 
@@ -33,7 +32,7 @@ export default class SingleChoice extends EventDispatcher {
      */
     this.autoCheck = autoCheck;
     this.descConst = descConst;
-
+    
     // add keyboard controls
     this.controls = new Controls([new UIKeyboard()]);
     this.controls.on('select', this.handleAlternativeSelected, this);
@@ -53,30 +52,75 @@ export default class SingleChoice extends EventDispatcher {
    * @param {jQuery} $container
    * @param {boolean} isCurrent Current slide we are on
    */
-  appendTo ($container, isCurrent) {
-    const questionId = `single-choice-${this.id}-question-${this.index}`;
+  appendTo ($container, isCurrent, numQuestions) {
+    const questionId = `single-choice-${this.descConst}-${this.id}-question-${this.index}`;
     this.$container = $container;
-
+    
+    
     // desc content should be shown all the time
     if(this.descConst === "descContent"){
+    
+      var infoText = '';
+      
+      if(this.index === 0){
+          infoText = "General information for solving the task" + '<br>';
+      }
+      
       this.$choice = $('<div>', {
-        'class': 'h5p-sc-slide h5p-sc h5p-sc-current-slide h5p-sc-question',
+        'class': 'h5p-sc-slide h5p-sc h5p-sc-current-slide',
         css: {'left': "0%"}
       });
       this.$choice.append($('<div>', {
-        'html': this.options.desc1 +'<br>'
+        'html': infoText + this.options.desc1
       }));  
-    }else{ // this is only important for questions
-      this.$choice = $('<div>', {
-        'class': 'h5p-sc-slide h5p-sc' + (isCurrent ? ' h5p-sc-current-slide' : ''),
-        css: {'left': (this.index * 100) + '%'}
-      });
       
-      this.$choice.append($('<div>', {
+    }
+    else if(this.descConst === "choiceContent"){
+    
+    
+    //console.log("isCurrent choiceContent");
+         //console.log(isCurrent);
+    
+    
+    
+         this.$choice = $('<div>', {
+        'class': 'h5p-sc-slide h5p-sc' + (isCurrent ? ' h5p-sc-current-slide' : ''),
+        css: {'left': "0%"} //{'left': (this.index * 100) + '%'}
+      });
+   
+      
+      var questNumber =  this.index+1;
+      var questText = '';
+      
+      if(numQuestions === 1){
+          questText = 'Question';
+          
+      } 
+      else{
+          questText = 'Question '+ questNumber+ ' of '+ numQuestions;
+      }
+     
+         this.$choice.append($('<div>', {
         'id': questionId,
         'class': 'h5p-sc-question',
-        'html': this.options.question
+        'html': questText + '<br>' + this.options.question
         
+      })); 
+    
+    }
+    else if(this.descConst  === "choice"){ // this is only important for questions
+      
+      console.log("isCurrent");
+         console.log(isCurrent);
+      
+      this.$choice = $('<div>', {
+        'class': 'h5p-sc-slide h5p-sc' + (isCurrent ? ' h5p-sc-current-slide' : ''),
+        css: {'left': "0%"} //{'left': (this.index * 100) + '%'}
+      });
+    
+      this.$choice.append($('<div>', {
+        'id': questionId,
+        'class': 'h5p-sc-question'
       })); 
 
       var $alternatives = $('<ul>', {
