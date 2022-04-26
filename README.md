@@ -1,8 +1,8 @@
- H5P Single Choice Set
+ H5P Single Choice Set with Score Editor
 =====================
 
-Allows you to create sets of single choice tasks.
+Allows you to create sets of single choice tasks together with score editor.
 
 ## License
 
-*H5P Single Choice Set* is [MIT licensed](LICENSE.md)
+*H5P Single Choice Set with Score Editor* is [MIT licensed](LICENSE.md)
