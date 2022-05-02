@@ -135,7 +135,7 @@ const S4L = (function () {
         });
         self.progressbar.setProgress(this.currentIndex);
        
-        console.log("For5++++++++++++++++++++");
+        console.log("For9++++++++++++++++++++");
         
         if(this.options.descriptions !== undefined){
         for (var i = 0; i < this.options.descriptions.length; i++) {
@@ -146,11 +146,11 @@ const S4L = (function () {
             
             choice.appendTo(this.$container, true);
            
-            if(indexDesc.Notation != undefined){
+            if(indexDesc.contents != undefined && indexDesc.contents[0] != undefined){
                 var $vseDesc = $('<div>',{
                     'id': 'vseDesc' + i.toString()
                 })
-                var vse = new VerovioScoreEditor($vseDesc[0], {data: indexDesc.Notation});
+                var vse = new VerovioScoreEditor($vseDesc[0], {data: indexDesc.contents[0]});
 
                 $vseDesc.appendTo(this.$container, (i === this.currentIndex))
                 this.vseContainer.push($vseDesc[0])
@@ -173,11 +173,12 @@ const S4L = (function () {
             //this.$slides.push(choice.$choice);
             
              var indexDesc = this.options.choices[i];
-            if(indexDesc.question_notation != undefined){
+            
+            if(indexDesc.questions!= undefined && indexDesc.questions[0] != undefined){
                 var $vseChoice = $('<div>',{
                     'id': 'vseChoice' + i.toString()
                 })
-                var vse = new VerovioScoreEditor($vseChoice[0], {data: indexDesc.question_notation});
+                var vse = new VerovioScoreEditor($vseChoice[0], {data: indexDesc.questions[0]});
                 this.vseContainer.push($vseChoice[0])
                 $vseChoice.appendTo(choice.$choice)
                 this.vseInstances.push(vse)
