@@ -110,18 +110,14 @@ const S4L = (function () {
             self.focusButton();
         });
         
-        const testId2 = `single-choice-WP5-${this.id}-test2-${this.index}`;
+        //const testId2 = `single-choice-WP5-${this.id}-test2-${this.index}`;
         
         this.$choices = $('<div>', {
-            'class': 'h5p-sc-set h5p-sc-animate'
-        });
-        
-        this.$desc = $('<div>', {
-            'id':  testId2,
-            'class': 'h5p-sc-set h5p-sc-animate'
+      'class': 'h5p-sc-set h5p-sc-animate'
+    });
 
-        });
         
+       
         // sometimes an empty object is in the choices
         this.options.choices = this.options.choices.filter(function (choice) {
             return choice !== undefined && ! ! choice.answers;
@@ -135,16 +131,16 @@ const S4L = (function () {
         });
         self.progressbar.setProgress(this.currentIndex);
        
-        console.log("For9++++++++++++++++++++");
+        //console.log("For3++++++++++++++++++++");
         
         if(this.options.descriptions !== undefined){
         for (var i = 0; i < this.options.descriptions.length; i++) {
              
             var indexDesc = this.options.descriptions[i];
                 
-            var choice = new SingleChoice(this.options.descriptions[i], i, this.contentId, self.options.behaviour.autoCheck, "descContent");
+            var choice = new SingleChoice(this.options.descriptions[i], i, this.contentId, self.options.behaviour.autoCheck);
             
-            choice.appendTo(this.$container, true);
+            choice.appendTo(this.$container, true, "descContent");
            
             if(indexDesc.contents != undefined && indexDesc.contents[0] != undefined){
                 var $vseDesc = $('<div>',{
@@ -162,17 +158,12 @@ const S4L = (function () {
          
         for (var i = 0; i < this.options.choices.length; i++) {
         
-          var choice = new SingleChoice(this.options.choices[i], i, this.contentId, self.options.behaviour.autoCheck, "choiceContent");            
+          var choice = new SingleChoice(this.options.choices[i], i, this.contentId, self.options.behaviour.autoCheck);            
           choice.on('finished', this.handleQuestionFinished, this);
           choice.on('alternative-selected', this.handleAlternativeSelected, this);
-         //console.log("this.currentIndex");
-         //console.log(this.currentIndex);
-         choice.appendTo(this.$container, true, numQuestions);
-          //choice.appendTo(this.$container, i === this.currentIndex, numQuestions);
-            //this.choices.push(choice);
-            //this.$slides.push(choice.$choice);
-            
-             var indexDesc = this.options.choices[i];
+          choice.appendTo(this.$choices, (i === this.currentIndex), "choiceContent", numQuestions);
+         
+           var indexDesc = this.options.choices[i];
             
             if(indexDesc.questions!= undefined && indexDesc.questions[0] != undefined){
                 var $vseChoice = $('<div>',{
@@ -186,22 +177,11 @@ const S4L = (function () {
             
             
   //style="transform: scale(2.5);"         
-            var choice = new SingleChoice(this.options.choices[i], i, this.contentId, self.options.behaviour.autoCheck, "choice");
-            choice.on('finished', this.handleQuestionFinished, this);
-            choice.on('alternative-selected', this.handleAlternativeSelected, this);
-             //console.log("this.currentIndex2");
-        // console.log(this.currentIndex);
-            choice.appendTo(this.$container, true, numQuestions);
+           choice.appendTo(this.$choices, (i === this.currentIndex), "choice");
             this.choices.push(choice);
             this.$slides.push(choice.$choice);
            
         }
-        
-                this.$choices.append($('<div>', {
-     
-      'html':  ""
-    }));
-    
         
         this.resultSlide = new ResultSlide(this.options.choices.length);
         this.resultSlide.appendTo(this.$choices);

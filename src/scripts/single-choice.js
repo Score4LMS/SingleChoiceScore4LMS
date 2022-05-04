@@ -15,7 +15,7 @@ export default class SingleChoice extends EventDispatcher {
    * @param {number} id
    * @param {boolean} autoCheck
    */
-  constructor (options, index, id, autoCheck, descConst = false) {
+  constructor (options, index, id, autoCheck) {
     super();
     
     // Extend defaults with provided options
@@ -31,7 +31,6 @@ export default class SingleChoice extends EventDispatcher {
      * @type {boolean}
      */
     this.autoCheck = autoCheck;
-    this.descConst = descConst;
     
     // add keyboard controls
     this.controls = new Controls([new UIKeyboard()]);
@@ -52,10 +51,10 @@ export default class SingleChoice extends EventDispatcher {
    * @param {jQuery} $container
    * @param {boolean} isCurrent Current slide we are on
    */
-  appendTo ($container, isCurrent, numQuestions) {
-    const questionId = `single-choice-${this.descConst}-${this.id}-question-${this.index}`;
+  appendTo ($container, isCurrent, descConst, numQuestions) {
+    const questionId = `single-choice-${this.id}-question-${this.index}`;
     this.$container = $container;
-    
+    this.descConst = descConst;
     
     // desc content should be shown all the time
     if(this.descConst === "descContent"){
@@ -76,16 +75,10 @@ export default class SingleChoice extends EventDispatcher {
       
     }
     else if(this.descConst === "choiceContent"){
-    
-    
-    //console.log("isCurrent choiceContent");
-         //console.log(isCurrent);
-    
-    
-    
+         
          this.$choice = $('<div>', {
         'class': 'h5p-sc-slide h5p-sc' + (isCurrent ? ' h5p-sc-current-slide' : ''),
-        css: {'left': "0%"} //{'left': (this.index * 100) + '%'}
+        css: {'left': (this.index * 100) + '%'}
       });
    
       
@@ -106,51 +99,42 @@ export default class SingleChoice extends EventDispatcher {
         'html': questText + '<br>' + this.options.question
         
       })); 
+      
     
     }
     else if(this.descConst  === "choice"){ // this is only important for questions
-      
-      console.log("isCurrent");
-         console.log(isCurrent);
-      
-      this.$choice = $('<div>', {
-        'class': 'h5p-sc-slide h5p-sc' + (isCurrent ? ' h5p-sc-current-slide' : ''),
-        css: {'left': "0%"} //{'left': (this.index * 100) + '%'}
-      });
+
+    var $alternatives = $('<ul>', {
+      'class': 'h5p-sc-alternatives',
+      'role': 'radiogroup',
+      'aria-labelledby': questionId
+    });
     
-      this.$choice.append($('<div>', {
-        'id': questionId,
-        'class': 'h5p-sc-question'
-      })); 
-
-      var $alternatives = $('<ul>', {
-        'class': 'h5p-sc-alternatives',
-        'role': 'radiogroup',
-        'aria-labelledby': questionId
-      });
-
-      this.$nextButton = $('<button>', {
-        html: 'Next',
-        'class': 'h5p-joubelui-button h5p-question-next',
-        'aria-disabled': 'true',
-        'tabindex': '-1',
-        'click': () => {
-          if(this.$nextButton.attr('aria-disabled') !== 'true') {
-            this.toggleNextButton(false);
-            this.checkAnswer();
-          }
+    this.$nextButton = $('<button>', {
+      html: 'Next',
+      'class': 'h5p-joubelui-button h5p-question-next',
+      'aria-disabled': 'true',
+      'tabindex': '-1',
+      'click': () => {
+        if(this.$nextButton.attr('aria-disabled') !== 'true') {
+          this.toggleNextButton(false);
+          this.checkAnswer();
         }
-      }).toggle(!this.autoCheck);
-      
-      if(this.options.answers !== false){
-          this.alternativeElements = this.options.answers.map(opts => this.createAlternativeElement(opts));
-          $alternatives.append(this.alternativeElements);
-          this.$choice.append($alternatives);
       }
+    }).toggle(!this.autoCheck);
+
+    this.alternativeElements = this.options.answers.map(opts => this.createAlternativeElement(opts));
+
+    $alternatives.append(this.alternativeElements);
+
+    this.$choice.append($alternatives);
+    this.$choice.append(this.$nextButton);
+   
+      
     }
 
     //append all tot their destination containers
-    this.$choice.append(this.$nextButton);
+    
     $container.append(this.$choice);
     return this.$choice;
   };
