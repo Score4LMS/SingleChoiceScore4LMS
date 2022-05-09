@@ -234,7 +234,7 @@ const S4L = (function () {
         })();
 
          //when everything has loaded successfully frames and svgs should beadjusted
-         $(this.adjustFrame.bind(this))
+         //$(this.adjustFrame.bind(this))
          $(this.loadObservers.bind(this))
  
     }
@@ -246,10 +246,20 @@ const S4L = (function () {
     /**
      * Adjust its contents when all content is loaded
      */
-    Score4LMS.prototype.adjustFrame = function(){
+    Score4LMS.prototype.adjustFrameStatic = function(){
        
         this.vseContainer.forEach(vc => {
-            vc.style.height = "130px" // todo: make more responsive (for now all all vse containers are 250px high)
+            console.log("vc", vc)
+            var defScale = vc.querySelector("#rootSVG .definition-scale")
+            console.log("defScale", defScale)
+            var dsHeight
+            if (defScale !== null){
+                var dsHeight = defScale.getBoundingClientRect().height / 10
+                dsHeight = dsHeight.toString() + "rem"
+                console.log("dsHeight", dsHeight)
+            }
+            vc.style.height = dsHeight || "130px" 
+            console.log("vc.style.height", vc.style.height)
         })
         var h5pContainer = document.querySelector(".h5p-container")
         var showChildren = h5pContainer.querySelectorAll(".h5p-sc-set > *, .h5p-actions, .vse-container, .h5p-sc")
@@ -262,6 +272,30 @@ const S4L = (function () {
         window.frameElement.style.height =  h5pContainerHeight.toString() + "px"
     }
 
+    /**
+     * Adjust its contents when all content is loaded
+     */
+     Score4LMS.prototype.adjustFrameResponsive = function(vseContainer){
+       
+        var defScale = vseContainer.querySelector("#rootSVG .definition-scale")
+        var dsHeight
+        var dsWidth
+        if (defScale !== null){
+            dsHeight = defScale.getBoundingClientRect().height / 11
+            dsHeight = dsHeight.toString() + "rem"
+        }
+        vseContainer.style.height = dsHeight || "20rem" 
+        
+        var h5pContainer = document.querySelector(".h5p-container")
+        var showChildren = h5pContainer.querySelectorAll(".h5p-sc-set > *, .h5p-actions, .vse-container, .h5p-sc")
+        var h5pContainerHeight = 0
+        showChildren.forEach(sc => {
+            h5pContainerHeight += sc.getBoundingClientRect().height
+            sc.style.position = "relative" // very important, so that the containers are displayed in the same column
+        })
+        //h5pContainer.style.height =  h5pContainerHeight.toString() + "px"
+        window.frameElement.style.height =  h5pContainerHeight.toString() + "px"
+    }
     /**
      * Load obeservers for changes in the dom, so that parameters of the vse can be updated 
      */
@@ -339,12 +373,16 @@ const S4L = (function () {
         // vseContainer.querySelectorAll("#sidebarContainer, #btnToolbar, #customToolbar, #interactionOverlay").forEach(tb => tb.style.setProperty("display" ,"none", "important"))
         var core = this.vseInstance.getCore()
         var toolkit = core.getVerovioWrapper().getToolkit()
-        // toolkit.setOptions({ // here we could set some options for verovio if needed
-
-        // })
-        core.setStyleOptions({".system": {"transform": ["scale(2.5)"]}}) // todo: make scale more responsive
+        toolkit.setOptions({ // here we could set some options for verovio if needed
+            //pageWidth: vseContainer.getBoundingClientRect().width,
+            adjustPageWidth: 1,
+            adjustPageHeight: 1
+        })
+        //core.setStyleOptions({".system": {"transform": ["scale(2)"]}}) // todo: make scale more responsive
         core.setHideUX(true)
-        core.loadData("", core.getCurrentMEI(false), false, "svg_output")
+        core.loadData("", core.getCurrentMEI(false), false, "svg_output").then(() => {
+            this.adjustFrameResponsive(vseContainer)
+        })
 
     }
 

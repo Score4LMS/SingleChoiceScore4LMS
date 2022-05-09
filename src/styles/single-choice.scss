@@ -11,6 +11,13 @@
   font-style: normal;
 }
 
+.vse-container{
+  position: relative !important;
+  // height: 100% !important;
+  overflow: scroll !important;
+  border:1px solid black !important;
+}
+
 /* Show radio button icon for non auto check */
 .h5p-sc-set-wrapper:not(.h5p-auto-check) {
   ul.h5p-sc-alternatives li[role="radio"] {
